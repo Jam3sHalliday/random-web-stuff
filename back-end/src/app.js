@@ -5,14 +5,16 @@ const compression = require('compression')
 
 const app = express()
 
-const PORT = 3000
+
+require('dotenv').config()
+require('./dbs/init.mongodb')
+
+const { checkOverload } = require('./helpers/check.connection')
 
 // MIDDLEWARE
 app.use(morgan('dev')) // support development environment
 app.use(helmet()) // hiding the technologies behind
 app.use(compression()) // compress the response to save bandwidth
-
-app.listen(PORT, (err) => console.error(err))
 
 app.get('/', (req, res, next) => {
     const str = 'lorem ipsum ces dolor'
