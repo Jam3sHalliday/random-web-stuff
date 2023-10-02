@@ -5,7 +5,6 @@ const compression = require('compression')
 
 const app = express()
 
-
 require('dotenv').config()
 require('./dbs/init.mongodb')
 
@@ -15,14 +14,11 @@ const { checkOverload } = require('./helpers/check.connection')
 app.use(morgan('dev')) // support development environment
 app.use(helmet()) // hiding the technologies behind
 app.use(compression()) // compress the response to save bandwidth
+app.use(express.json())
+app.use(express.urlencoded({
+    extended: true
+}))
 
-app.get('/', (req, res, next) => {
-    const str = 'lorem ipsum ces dolor'
-    
-    return res.status(200).json({
-        message: 'Lorem Ipsum',
-        metadata: str.repeat(10000)
-    })
-})
+app.use('/', require('./routes'))
 
 module.exports = app
