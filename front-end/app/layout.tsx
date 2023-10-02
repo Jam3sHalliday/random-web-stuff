@@ -1,6 +1,8 @@
 import './globals.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import { ThemeSwitcher } from './components/theme-switcher'
+import { Providers } from './providers/theme'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -16,7 +18,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
-    </html>
+      <body className={inter.className}>
+        <Providers>
+          <div className="fixed top-4 right-4">
+            <ThemeSwitcher />
+          </div>
+          {children}
+        </Providers>
+      </body>
+    </html >
   )
 }
