@@ -8,7 +8,9 @@ class Database {
     }
 
     connect(type = 'mongodb') {
-        mongoose.connect(process.env.MONGO_STR)
+        mongoose.connect(process.env.MONGO_STR, {
+            maxPoolSize: 39
+        })
 
         if (true) {
             mongoose.set('debug', true)

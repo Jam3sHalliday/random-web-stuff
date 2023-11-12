@@ -11,10 +11,16 @@ const countConnected = () => console.log(mongoose.connections.length, ' connecte
 const checkOverload = () => {
     setInterval(() => {
         const connections = mongoose.connections.length
-        const cores = os.cpus.length
+        const cores = os.cpus().length
         const memoryUsage = process.memoryUsage().rss
 
         const maxLoad = 5 * cores
+        console.log(`
+            connections: ${connections}
+            cores: ${cores}
+            memoryUsage:${memoryUsage/1024/1024}
+            ----------------------
+        `)
 
         if (connections >= maxLoad) {
             console.log('Overload detected, used ', memoryUsage / 1024 / 1024, 'MB')
