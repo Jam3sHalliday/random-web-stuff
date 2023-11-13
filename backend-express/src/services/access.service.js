@@ -22,8 +22,7 @@ class AccessService {
             // lean make queries faster, return js obj instead of Mongoose document.
             const shopHolder = await shopModel.findOne({ email }).lean()
 
-            if (shopHolder) throw BadRequestError('Error: Shop already existed')
-
+            if (shopHolder) throw new BadRequestError('Shop already existed')
             const hashedPwd = await bcrypt.hash(password, 10)
 
             const newShop = await shopModel.create({
@@ -54,7 +53,7 @@ class AccessService {
                     privateKey
                 })
 
-                if (!keys) throw BadRequestError('Error: Keys creation error', 500)
+                if (!keys) throw new BadRequestError('Keys creation error', 500)
 
                 // create token pair
                 const tokens = await createTokenPair({
@@ -78,11 +77,7 @@ class AccessService {
                 metadata: null
             }
         } catch (err) {
-            return {
-                code: 500,
-                error: err.message,
-                status: 'err'
-            }
+            throw new BadRequestError(err)
         }
     }
 }
