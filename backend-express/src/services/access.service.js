@@ -1,6 +1,7 @@
 'use strict'
 
 const { createTokenPair } = require('../auth/authUtils')
+const { BadRequestError } = require('../core/error.response')
 const shopModel = require('../models/shop.model')
 const { getMinData } = require('../utils')
 const KeyService = require('./key.service')
@@ -21,12 +22,7 @@ class AccessService {
             // lean make queries faster, return js obj instead of Mongoose document.
             const shopHolder = await shopModel.findOne({ email }).lean()
 
-            if (shopHolder) {
-                return {
-                    code: 409,
-                    message: 'Already exists'
-                }
-            }
+            if (shopHolder) throw BadRequestError('Error: Shop already existed')
 
             const hashedPwd = await bcrypt.hash(password, 10)
 
@@ -58,12 +54,7 @@ class AccessService {
                     privateKey
                 })
 
-                if (!keys) {
-                    return {
-                        code: 500,
-                        message: 'keys error'
-                    }
-                }
+                if (!keys) throw BadRequestError('Error: Keys creation error', 500)
 
                 // create token pair
                 const tokens = await createTokenPair({
@@ -87,7 +78,6 @@ class AccessService {
                 metadata: null
             }
         } catch (err) {
-            console.log(err)
             return {
                 code: 500,
                 error: err.message,
