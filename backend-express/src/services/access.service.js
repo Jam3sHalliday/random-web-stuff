@@ -5,6 +5,7 @@ const { BadRequestError } = require('../core/error.response')
 const shopModel = require('../models/shop.model')
 const { getMinData } = require('../utils')
 const KeyService = require('./key.service')
+const { findByEmail } = require("../services/shop.service")
 
 const bcrypt = require('bcrypt')
 const crypto = require('node:crypto')
@@ -17,6 +18,36 @@ const SHOP_ROLES = {
 }
 
 class AccessService {
+    static logIn = async ({ email, password, refreshToken = null }) => {
+        const shop = await findByEmail({ email })
+
+        if (!shop) throw new BadRequestError('Email not found')
+
+        const match = bcrypt.compare(password, shop.password)
+
+        if (!match) throw new AuthFailureError('Authentication failed')
+
+        const privateKey = crypto.randomBytes(64).toString('hex')
+        const publicKey = crypto.randomBytes(64).toString('hex')
+
+        const tokens = await createTokenPair({
+            userId: shop._id,
+            email
+        }, publicKey, privateKey)
+
+        await KeyService.createKeyToken({
+            userId: shop._id,
+            refreshToken: tokens.refreshToken,
+            privateKey,
+            publicKey
+        })
+
+        return {
+            shop: getMinData(shop, ['_id', 'name', 'email']),
+            tokens
+        }
+    }
+
     static signUp = async ({ name, email, password }) => {
         try {
             // lean make queries faster, return js obj instead of Mongoose document.
@@ -44,8 +75,8 @@ class AccessService {
                 //     }
                 // })
 
-                const privateKey = crypto.getRandomValues(new Uint32Array(1)).toString('hex')
-                const publicKey = crypto.getRandomValues(new Uint32Array(1)).toString('hex')
+                const privateKey = crypto.randomBytes(64).toString('hex')
+                const publicKey = crypto.randomBytes(64).toString('hex')
 
                 const keys = await KeyService.createKeyToken({
                     publicKey,

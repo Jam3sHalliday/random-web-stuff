@@ -1,10 +1,21 @@
 'use strict'
 
 const { BadRequestError } = require("../core/error.response")
-const { CREATED } = require("../core/success.response")
+const { CREATED, SuccessResponse } = require("../core/success.response")
 const AccessService = require("../services/access.service")
 
 class AccessController {
+    login = async (req, res, next) => {
+        try {
+            return new SuccessResponse({
+                metadata: await AccessService.logIn(req.body),
+            }).send(res)
+        } catch (err) {
+            console.log(err, '-------')
+            return res.status(err.status).json(err.message)
+        }
+    }
+    
     signUp = async (req, res, next) => {
         try {
             return new CREATED({

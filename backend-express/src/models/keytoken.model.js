@@ -20,6 +20,10 @@ const keyModel = new Schema({
         require: true
     },
     refreshToken: {
+        type: String,
+        required: true
+    },
+    usedRefreshTokens: {
         type: Array,
         default: []
     }
