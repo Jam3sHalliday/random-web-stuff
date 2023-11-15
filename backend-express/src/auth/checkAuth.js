@@ -25,7 +25,7 @@ const apiKeyValidator = async (req, res, n) => {
 }
 
 const permissionValidator = (permission) => (req, res, n) => {
-    if (!req.objKey.permissions) {
+    if (!req.objKey?.permissions) {
         return res.status(403).json({
             message: 'Permission denied'
         })
@@ -37,6 +37,4 @@ const permissionValidator = (permission) => (req, res, n) => {
     return n()
 }
 
-const asyncHandler = (func) => (req, res, n) => func(req, res, n).catch(n)
-
-module.exports = { apiKeyValidator, permissionValidator, asyncHandler }
+module.exports = { apiKeyValidator, permissionValidator }
